@@ -22,6 +22,8 @@ BOTTOM = SCREEN_HEIGHT/2 - SCREEN_HEIGHT/3
 CAR_WIDTH = 100
 CAR_HEIGHT = 50
 
+SHOW_GAME = True
+
 class Game(arcade.Window):
 
     def __init__(self, width, height, title):
@@ -113,8 +115,35 @@ class Game(arcade.Window):
         del self.enemy_list[:]
 
 def main():
-    Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    arcade.run()
+    if SHOW_GAME == True:
+        Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        arcade.run()
+    else:
+        enemy_list = []
+        pop = Population(500, enemy_list)
+        frame_counter = 0
+
+        while True:
+            if pop.done() != True:
+                frame_counter += 1
+                if (frame_counter % 30 == 0):
+                    location = [BOTTOM, MIDDLE, TOP]
+                    index = random.randrange(len(location))
+                    enemy = Enemy(SCREEN_WIDTH, location[index], -10/2, 0, CAR_HEIGHT, arcade.color.ANDROID_GREEN)
+                    enemy_list.append(enemy)
+
+                for i, enemy in enumerate(enemy_list):
+                    enemy.update()
+                    if enemy.dead:
+                        del enemy_list[i]
+
+                pop.update_alive()
+            else:
+                print(f"Gen {pop.gen}")
+                print(f"Best score: {pop.best_score}")
+                pop.natural_selection()
+                del enemy_list[:]
+
 
 if __name__ == "__main__":
     main()
