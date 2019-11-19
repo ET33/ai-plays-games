@@ -107,26 +107,15 @@ class Population:
         self.species.sort(key=lambda x: x.best_fitness, reverse=True)
 
     def kill_stale_species(self):
-        #TODO
-        tag_for_deletion = []
-
-        for i, species in enumerate(self.species[2:]):
-            if species.staleness >= 15:
-                tag_for_deletion.append(i + 2)
-
-        for remove_index in tag_for_deletion:
-            del self.species[remove_index]
+        self.species[2:] = [species for species in self.species[2:]
+                           if species.staleness < 15]
     
     def kill_bad_species(self):
         average_sum = self.get_average_fitness_sum()
-        tag_for_deletion = []
 
-        for i, species in enumerate(self.species[1:]):
-            if species.average_fitness/average_sum * len(self.pop) < 1:
-                tag_for_deletion.append(i + 1)
-
-        for remove_index in tag_for_deletion:
-            del self.species[remove_index]
+        self.species[1:] = [species for species in self.species[1:]
+                           if species.average_fitness/average_sum *
+                           len(self.pop) >= 1]
 
     def cull_species(self):
         for species in self.species:
