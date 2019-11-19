@@ -45,13 +45,20 @@ class Game(arcade.Window):
             return
 
         arcade.start_render()
-        arcade.draw_text("Score: " + str(self.pop.pop[0].score), 0.05*SCREEN_WIDTH, 0.95*SCREEN_HEIGHT, arcade.color.WHITE, 20)
 
-        max = 0
+        max_fitness = 0
         player_to_draw = 0
+
         for player in self.pop.pop:
-            if player.fitness >= max and player.dead == False:
+            if player.fitness >= max_fitness and not player.dead:
                 player_to_draw = player
+                max_fitness = player.fitness
+
+        arcade.draw_text("Current player \n\n" + \
+                         "Score: " + str(player_to_draw.score) + "\n" + \
+                         "Fitness: " + str(int(player_to_draw.fitness)), \
+                         0.01*SCREEN_WIDTH, 0.9*SCREEN_HEIGHT,
+                         arcade.color.WHITE, 12)
 
         player_to_draw.draw()
             
