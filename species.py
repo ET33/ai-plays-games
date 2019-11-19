@@ -74,6 +74,9 @@ class Species:
             self.staleness += 1
 
     def set_average(self):
+        if len(self.players) == 0:
+            return
+
         sum = 0
 
         for player in self.players:
