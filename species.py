@@ -1,4 +1,4 @@
-from random import uniform
+from random import uniform, randrange
 
 class Species:
     def __init__(self, player=None):
@@ -9,6 +9,9 @@ class Species:
         self.excess_coeff = 1
         self.weight_diff_coeff = 0.5
         self.compatibility_threshold = 3
+        self.color = (randrange(256),
+                      randrange(256),
+                      randrange(256))
 
         if player != None:
             self.players.append(player)

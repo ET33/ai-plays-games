@@ -90,11 +90,13 @@ class Population:
             for species in self.species:
                 if species.same_species(player.brain) == True:
                     species.add_to_species(player)
+                    player.color = species.color
                     species_found = True
                     break
 
             if species_found == False:
                 self.species.append(Species(player))
+                player.color = self.species[-1].color
 
     def calculate_fitness(self):
         for player in self.pop:

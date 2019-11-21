@@ -1,7 +1,6 @@
 import arcade
 
 from genome import Genome
-from random import uniform
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -21,15 +20,7 @@ class Player:
         self.change_y = 0
         self.size_x = CAR_WIDTH
         self.size_y = CAR_HEIGHT
-
-        p = uniform(0,1)
-        if p < 1/3:
-            self.color = (255, 0, 0)
-        elif p >= 1/3 and p < 2/3:
-            self.color = (0, 255, 0)
-        elif p >= 2/3:
-            self.color = (0, 0, 255)
-
+        self.color = (255, 255, 255)
         self.speed = 10
         self.dead = False
         self.next_lane = None
@@ -111,6 +102,7 @@ class Player:
         clone.brain.generate_network()
         clone.gen = self.gen
         clone.best_score = self.best_score
+        clone.color = self.color
 
         return clone
 
