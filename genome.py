@@ -79,12 +79,14 @@ class Genome:
 
         random_index = randrange(len(self.genes))
 
-        delete_this_variable = 0
-        while((self.genes[random_index].from_node is self.nodes[self.bias_node]) and len(self.genes) != 1):
+        tries = 0
+        while (self.genes[random_index].from_node is
+               self.nodes[self.bias_node]) and tries < 20:
             random_index = randrange(len(self.genes))
-            delete_this_variable += 1
-            if delete_this_variable == 1000:
-                break
+            tries += 1
+
+        if self.genes[random_index].from_node is self.nodes[self.bias_node]:
+            return
 
         self.genes[random_index].enabled = False
 
