@@ -39,30 +39,24 @@ class Game(arcade.Window):
         self.frame_counter = 0
         self.display_info = True
         self.pop = Population(500, self.enemy_list)
-        self.show_nothing = False
 
     def on_draw(self):
         """ Called whenever we need to draw the window. """
-        if self.show_nothing == True:
-            return
-
         arcade.start_render()
 
-        max_fitness = 0
-        player_to_draw = 0
+        players = [player for player in self.pop.pop.copy() if not player.dead]
+        players.sort(key=lambda x: x.fitness, reverse=True)
+        players_to_draw = min(len(players), 5)
 
-        for player in self.pop.pop:
-            if player.fitness >= max_fitness and not player.dead:
-                player_to_draw = player
-                max_fitness = player.fitness
+        for i in range(players_to_draw):
+            players[i].draw()
 
-        arcade.draw_text("Current player \n\n" + \
-                         "Score: " + str(player_to_draw.score) + "\n" + \
-                         "Fitness: " + str(int(player_to_draw.fitness)), \
-                         0.01*SCREEN_WIDTH, 0.9*SCREEN_HEIGHT,
-                         arcade.color.WHITE, 12)
-
-        player_to_draw.draw()
+        if not self.pop.done():
+            arcade.draw_text("Current player \n\n" +
+                             "Score: " + str(players[0].score) + "\n" +
+                             "Best fitness: " + str(int(players[0].fitness)),
+                             0.01*SCREEN_WIDTH, 0.9*SCREEN_HEIGHT,
+                             arcade.color.WHITE, 12)
             
         for enemy in self.enemy_list:
             enemy.draw()
@@ -93,20 +87,6 @@ class Game(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         """ Called whenever the user presses a key. """
-        if key == arcade.key.LEFT:
-            self.update_rate += 1/30
-            self.set_update_rate(self.update_rate)
-        elif key == arcade.key.RIGHT:
-            self.update_rate -= 1/30
-            self.set_update_rate(self.update_rate)
-        elif key == arcade.key.H:
-            self.show_nothing = not self.show_nothing
-            if self.show_nothing == True:
-                self.set_update_rate(1e-6)
-            else:
-                self.set_update_rate(self.update_rate)
-
-
 
     def on_key_release(self, key, modifiers):
         """ Called whenever a user releases a key. """
