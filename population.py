@@ -64,8 +64,8 @@ class Population:
 
         for species in self.species:
             children.append(species.champ.clone())
-
-            number_of_children = int(species.average_fitness/average_sum * len(self.pop))-1
+            number_of_children = int(species.average_fitness / average_sum
+                                     * len(self.pop)) - 1
             for i in range(number_of_children):
                 children.append(species.get_baby(self.innovation_history))
 

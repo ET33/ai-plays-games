@@ -14,7 +14,8 @@ class Node:
 
         for connection in self.output_connections:
             if connection.enabled:
-                connection.to_node.input_sum += connection.weight * self.output_value
+                connection.to_node.input_sum += (connection.weight
+                                                 * self.output_value)
 
     def sigmoid(self, x):
         return 1/(1+exp(-1*x))

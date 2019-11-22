@@ -27,7 +27,9 @@ class Species:
         if large_genome_normaliser < 1:
             large_genome_normaliser = 1
 
-        compatibility = (self.excess_coeff * excess_and_disjoint/large_genome_normaliser) + (self.weight_diff_coeff * average_weight_diff)
+        compatibility = (self.excess_coeff * excess_and_disjoint
+                         / large_genome_normaliser
+                         + self.weight_diff_coeff * average_weight_diff)
         return self.compatibility_threshold > compatibility
 
     def add_to_species(self, player):

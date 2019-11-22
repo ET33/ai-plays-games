@@ -94,23 +94,36 @@ class Genome:
         self.nodes.append(Node(new_node_index))
         self.next_node += 1
 
-        connection_innovation_number = self.get_innovation_number(innovation_history, self.genes[random_index].from_node, \
-                                                                  self.get_node(new_node_index))
-        self.genes.append(Connection(self.genes[random_index].from_node, self.get_node(new_node_index), 1, connection_innovation_number))
+        connection_innovation_number = self.get_innovation_number(
+                                       innovation_history,
+                                       self.genes[random_index].from_node,
+                                       self.get_node(new_node_index))
+        self.genes.append(Connection(self.genes[random_index].from_node,
+                                     self.get_node(new_node_index), 1,
+                                     connection_innovation_number))
 
-        connection_innovation_number = self.get_innovation_number(innovation_history, self.get_node(new_node_index), \
-                                                                  self.genes[random_index].to_node)
+        connection_innovation_number = self.get_innovation_number(
+                                       innovation_history,
+                                       self.get_node(new_node_index),
+                                       self.genes[random_index].to_node)
+        self.genes.append(Connection(self.get_node(new_node_index),
+                                     self.genes[random_index].to_node,
+                                     self.genes[random_index].weight,
+                                     connection_innovation_number))
 
-        self.genes.append(Connection(self.get_node(new_node_index), self.genes[random_index].to_node, \
-                                     self.genes[random_index].weight, connection_innovation_number))
+        self.get_node(new_node_index).layer = self.genes[
+                                              random_index].from_node.layer + 1
 
-        self.get_node(new_node_index).layer = self.genes[random_index].from_node.layer + 1
+        connection_innovation_number = self.get_innovation_number(
+                                       innovation_history,
+                                       self.nodes[self.bias_node],
+                                       self.get_node(new_node_index))
+        self.genes.append(Connection(self.nodes[self.bias_node],
+                                     self.get_node(new_node_index), 0,
+                                     connection_innovation_number))
 
-        connection_innovation_number = self.get_innovation_number(innovation_history, self.nodes[self.bias_node], \
-                                                                  self.get_node(new_node_index))
-        self.genes.append(Connection(self.nodes[self.bias_node], self.get_node(new_node_index), 0, connection_innovation_number))
-
-        if self.get_node(new_node_index).layer == self.genes[random_index].to_node.layer:
+        if self.get_node(new_node_index).layer == self.genes[
+                                                  random_index].to_node.layer:
             for node in self.nodes:
                 if node is not self.get_node(new_node_index):
                     if node.layer >= self.get_node(new_node_index).layer:
@@ -130,19 +143,25 @@ class Genome:
         while self.is_connection_viable(random_node_1, random_node_2) == False:
             random_node_1 = randrange(len(self.nodes))
             random_node_2 = randrange(len(self.nodes))
-        
+
         if self.nodes[random_node_1].layer > self.nodes[random_node_2].layer:
             swap = random_node_2
             random_node_2 = random_node_1
             random_node_1 = swap
 
-        connection_innovation_number = self.get_innovation_number(innovation_history, self.nodes[random_node_1], \
-                                                                  self.nodes[random_node_2])
-        self.genes.append(Connection(self.nodes[random_node_1], self.nodes[random_node_2], uniform(-1, 1), connection_innovation_number))
+        connection_innovation_number = self.get_innovation_number(
+                                       innovation_history,
+                                       self.nodes[random_node_1],
+                                       self.nodes[random_node_2])
+        self.genes.append(Connection(self.nodes[random_node_1],
+                                     self.nodes[random_node_2],
+                                     uniform(-1, 1),
+                                     connection_innovation_number))
         self.connect_nodes()
 
     def is_connection_viable(self, node_1, node_2):
-        if self.nodes[node_1].layer == self.nodes[node_2].layer or self.nodes[node_1].is_connected(self.nodes[node_2]):
+        if (self.nodes[node_1].layer == self.nodes[node_2].layer
+            or self.nodes[node_1].is_connected(self.nodes[node_2])):
             return False
 
         return True
@@ -163,7 +182,10 @@ class Genome:
             for gene in self.genes:
                 innovation_numbers.append(gene.innovation_number)
 
-            innovation_history.append(ConnectionHistory(from_node.number, to_node.number, connection_innovation_number, innovation_numbers))
+            innovation_history.append(ConnectionHistory(from_node.number,
+                                      to_node.number,
+                                      connection_innovation_number,
+                                      innovation_numbers))
             self.next_connection_number += 1
 
         return connection_innovation_number
@@ -222,7 +244,8 @@ class Genome:
         for gene in self.genes:
             set_enabled = True
 
-            parent_2_gene = self.matching_gene(parent_2, gene.innovation_number)
+            parent_2_gene = self.matching_gene(parent_2,
+                                               gene.innovation_number)
 
             if parent_2_gene is not None:
                 if gene.enabled == False or parent_2_gene.enabled == False:
@@ -246,7 +269,9 @@ class Genome:
             child.nodes.append(node.clone())
 
         for i, gene in enumerate(child_genes):
-            child.genes.append(gene.clone(child.get_node(gene.from_node.number), child.get_node(gene.to_node.number)))
+            child.genes.append(gene.clone(
+                               child.get_node(gene.from_node.number),
+                               child.get_node(gene.to_node.number)))
             child.genes[i].enabled = is_enabled[i]
 
         child.connect_nodes()
@@ -266,7 +291,9 @@ class Genome:
             clone.nodes.append(node.clone())
 
         for gene in self.genes:
-            clone.genes.append(gene.clone(clone.get_node(gene.from_node.number), clone.get_node(gene.to_node.number)))
+            clone.genes.append(gene.clone(
+                               clone.get_node(gene.from_node.number),
+                               clone.get_node(gene.to_node.number)))
 
         clone.layers = self.layers
         clone.next_node = self.next_node

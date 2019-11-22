@@ -1,8 +1,5 @@
-"""remove all elements in list python
-This simple animation example shows how to move an item with the keyboard.
-
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.move_keyboard
+"""A Neuroevolution of Augmenting Topologies (NEAT) method implementation for
+training neural networks to play games.
 """
 
 import arcade
@@ -41,7 +38,7 @@ class Game(arcade.Window):
         self.pop = Population(500, self.enemy_list)
 
     def on_draw(self):
-        """ Called whenever we need to draw the window. """
+        """Called whenever we need to draw the window."""
         arcade.start_render()
 
         players = [player for player in self.pop.pop.copy() if not player.dead]
@@ -52,10 +49,10 @@ class Game(arcade.Window):
             players[i].draw()
 
         if not self.pop.done():
-            arcade.draw_text("Current player \n\n" +
-                             "Score: " + str(players[0].score) + "\n" +
-                             "Best fitness: " + str(int(players[0].fitness)),
-                             0.01*SCREEN_WIDTH, 0.9*SCREEN_HEIGHT,
+            arcade.draw_text("Current player \n\n"
+                             + "Score: " + str(players[0].score) + "\n"
+                             + "Best fitness: " + str(int(players[0].fitness)),
+                             0.01 * SCREEN_WIDTH, 0.9 * SCREEN_HEIGHT,
                              arcade.color.WHITE, 12)
             
         for enemy in self.enemy_list:
@@ -67,7 +64,8 @@ class Game(arcade.Window):
             if (self.frame_counter % 30 == 0):
                 location = [BOTTOM, MIDDLE, TOP]
                 index = random.randrange(len(location))
-                enemy = Enemy(SCREEN_WIDTH, location[index], -10, 0, CAR_HEIGHT, arcade.color.ANDROID_GREEN)
+                enemy = Enemy(SCREEN_WIDTH, location[index], -7.5, 0,
+                              CAR_HEIGHT, arcade.color.ANDROID_GREEN)
                 self.enemy_list.append(enemy)
 
             for i, enemy in enumerate(self.enemy_list):
@@ -86,10 +84,10 @@ class Game(arcade.Window):
             self.display_info = True
 
     def on_key_press(self, key, modifiers):
-        """ Called whenever the user presses a key. """
+        """Called whenever the user presses a key."""
 
     def on_key_release(self, key, modifiers):
-        """ Called whenever a user releases a key. """
+        """Called whenever a user releases a key."""
 
     def reset_enemies(self):
         del self.enemy_list[:]
@@ -109,7 +107,8 @@ def main():
                 if (frame_counter % 30 == 0):
                     location = [BOTTOM, MIDDLE, TOP]
                     index = random.randrange(len(location))
-                    enemy = Enemy(SCREEN_WIDTH, location[index], -10/2, 0, CAR_HEIGHT, arcade.color.ANDROID_GREEN)
+                    enemy = Enemy(SCREEN_WIDTH, location[index], -7.5, 0,
+                                  CAR_HEIGHT, arcade.color.ANDROID_GREEN)
                     enemy_list.append(enemy)
 
                 for i, enemy in enumerate(enemy_list):

@@ -21,7 +21,8 @@ class Connection:
                 self.weight = -1
 
     def clone(self, from_node, to_node):
-        clone = Connection(from_node, to_node, self.weight, self.innovation_number)
+        clone = Connection(from_node, to_node, self.weight,
+                           self.innovation_number)
         clone.enabled = True
 
         return clone

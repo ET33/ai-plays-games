@@ -13,7 +13,6 @@ CAR_HEIGHT = 50
 
 class Player:
     def __init__(self, enemy_list):
-        # Take the parameters of the init function above, and create instance variables out of them.
         self.position_x = 0.1*SCREEN_WIDTH
         self.position_y = MIDDLE
         self.change_x = 0
@@ -35,7 +34,7 @@ class Player:
         self.gen = 0
 
         self.genome_inputs = 4 
-        self.genome_outputs = 2 # up or down?
+        self.genome_outputs = 2 # Up or down?
 
         self.vision = [0 for _ in range(self.genome_inputs)]
         self.decision = [0 for _ in range(self.genome_outputs)]
@@ -43,7 +42,8 @@ class Player:
         self.brain = Genome(self.genome_inputs, self.genome_outputs)
 
     def draw(self):
-        arcade.draw_rectangle_filled(self.position_x, self.position_y, self.size_x, self.size_y, self.color)
+        arcade.draw_rectangle_filled(self.position_x, self.position_y,
+                                     self.size_x, self.size_y, self.color)
 
     def update(self):
         self.increment_counters()
@@ -134,9 +134,12 @@ class Player:
                     if dist < dist_min_top:
                         dist_min_top = dist
 
-            self.vision[0] = dist_min_bot/SCREEN_WIDTH if dist_min_bot != 1e6 else 1
-            self.vision[1] = dist_min_mid/SCREEN_WIDTH if dist_min_mid != 1e6 else 1
-            self.vision[2] = dist_min_top/SCREEN_WIDTH if dist_min_top != 1e6 else 1
+            self.vision[0] = (dist_min_bot/SCREEN_WIDTH if dist_min_bot != 1e6
+                                                        else 1)
+            self.vision[1] = (dist_min_mid/SCREEN_WIDTH if dist_min_mid != 1e6
+                                                        else 1)
+            self.vision[2] = (dist_min_top/SCREEN_WIDTH if dist_min_top != 1e6
+                                                        else 1)
 
         else:
             self.vision[0] = 1
