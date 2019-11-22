@@ -1,7 +1,7 @@
 import arcade
 
 
-class Enemy
+class Enemy:
 
     speed_x = -7.5
     size_x = 50
