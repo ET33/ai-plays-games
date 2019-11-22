@@ -2,13 +2,13 @@ from player import Player
 from species import Species
 
 class Population:
-    def __init__(self, size, enemy_list):
+    def __init__(self, size, game):
         self.pop = []
         self.best_score = 0
         self.innovation_history = []
         self.gen_players = []
         self.species = []
-        self.enemy_list = enemy_list
+        self.game = game
         self.gen = 0
 
         self.mass_extinction_event = False
@@ -16,7 +16,7 @@ class Population:
         self.population_life = 0
 
         for i in range(size):
-            self.pop.append(Player(self.enemy_list))
+            self.pop.append(Player(self.game))
             self.pop[i].brain.generate_network()
             self.pop[i].brain.mutate(self.innovation_history)
 

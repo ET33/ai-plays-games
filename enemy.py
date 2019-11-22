@@ -1,44 +1,39 @@
 import arcade
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Game"
-MOVEMENT_SPEED = 10
-TOP = SCREEN_HEIGHT/2 + SCREEN_HEIGHT/3
-MIDDLE = SCREEN_HEIGHT/2
-BOTTOM = SCREEN_HEIGHT/2 - SCREEN_HEIGHT/3
-CAR_WIDTH = 100
-CAR_HEIGHT = 50
 
-class Enemy:
-    def __init__(self, position_x, position_y, change_x, change_y, radius,
-                 color):
+class Enemy
+
+    speed_x = -7.5
+    size_x = 50
+    size_y = 50
+    color = (255, 55, 55)
+
+    def __init__(self, position_x, position_y):
         self.position_x = position_x
         self.position_y = position_y
-        self.change_x = change_x
-        self.change_y = change_y
-        self.radius = radius
-        self.color = color
         self.dead = False
 
     def draw(self):
+        """Draw itself on the screen."""
         arcade.draw_rectangle_filled(self.position_x, self.position_y,
-                                     self.radius, self.radius, self.color)
+                                     self.size_x, self.size_y, self.color)
 
     def update(self):
-        self.position_x += self.change_x
-        if self.position_x + self.radius/2 < 0:
+        """Update state of itself."""
+        self.position_x += self.speed_x
+        if self.position_x + self.size_x / 2 < 0: # Out of bounds
             self.dead = True
 
     def collided(self, player):
-        if (player.position_x - CAR_WIDTH / 2
-            < self.position_x + self.radius / 2
-            and player.position_x + CAR_WIDTH / 2
-            > self.position_x - self.radius / 2
-            and player.position_y - CAR_HEIGHT / 2
-            < self.position_y + self.radius / 2
-            and player.position_y + CAR_HEIGHT / 2
-            > self.position_y - self.radius / 2):
+        """Check collision with given player."""
+        if (player.position_x - player.size_x / 2
+            < self.position_x + self.size_x / 2
+            and player.position_x + player.size_x / 2
+            > self.position_x - self.size_x / 2
+            and player.position_y - player.size_y / 2
+            < self.position_y + self.size_y / 2
+            and player.position_y + player.size_y / 2
+            > self.position_y - self.size_y / 2):
             return True
         else:
             return False

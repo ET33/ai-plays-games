@@ -9,37 +9,30 @@ from player import Player
 from enemy import Enemy
 from population import Population
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Game"
-MOVEMENT_SPEED = 10
-TOP = SCREEN_HEIGHT/2 + SCREEN_HEIGHT/3
-MIDDLE = SCREEN_HEIGHT/2
-BOTTOM = SCREEN_HEIGHT/2 - SCREEN_HEIGHT/3
-CAR_WIDTH = 100
-CAR_HEIGHT = 50
-
-SHOW_GAME = True
 
 class Game(arcade.Window):
 
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
 
-        self.set_mouse_visible(False)
-
-        arcade.set_background_color(arcade.color.BLACK_OLIVE)
-
-        self.update_rate = 1/60
-        self.set_update_rate(self.update_rate)
+        self.top = self.height/2 + 0.25 * self.height
+        self.middle = self.height/2
+        self.bottom = self.height/2 - 0.25 * self.height
+        self.show_game = True
         self.enemy_list = []
         self.frame_counter = 0
         self.display_info = True
-        self.pop = Population(500, self.enemy_list)
+        self.pop = Population(500, self)
+
+        self.set_mouse_visible(False)
+        arcade.set_background_color(arcade.color.BLACK_OLIVE)
+
 
     def on_draw(self):
         """Called whenever we need to draw the window."""
         arcade.start_render()
+        if not self.show_game:
+            return
 
         players = [player for player in self.pop.pop.copy() if not player.dead]
         players.sort(key=lambda x: x.fitness, reverse=True)
@@ -52,7 +45,7 @@ class Game(arcade.Window):
             arcade.draw_text("Current player \n\n"
                              + "Score: " + str(players[0].score) + "\n"
                              + "Best fitness: " + str(int(players[0].fitness)),
-                             0.01 * SCREEN_WIDTH, 0.9 * SCREEN_HEIGHT,
+                             0.01 * self.width, 0.9 * self.height,
                              arcade.color.WHITE, 12)
             
         for enemy in self.enemy_list:
@@ -62,16 +55,17 @@ class Game(arcade.Window):
         if self.pop.done() != True:
             self.frame_counter += 1
             if (self.frame_counter % 30 == 0):
-                location = [BOTTOM, MIDDLE, TOP]
+                location = [self.bottom, self.middle, self.top]
                 index = random.randrange(len(location))
-                enemy = Enemy(SCREEN_WIDTH, location[index], -7.5, 0,
-                              CAR_HEIGHT, arcade.color.ANDROID_GREEN)
+                enemy = Enemy(self.width, location[index])
                 self.enemy_list.append(enemy)
 
             for i, enemy in enumerate(self.enemy_list):
                 enemy.update()
                 if enemy.dead:
                     del self.enemy_list[i]
+            self.enemy_list[:] = [enemy for enemy in self.enemy_list
+                                  if not enemy.dead]
 
             self.pop.update_alive()
             if self.display_info == True:
@@ -85,6 +79,8 @@ class Game(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         """Called whenever the user presses a key."""
+        if key == arcade.key.H:
+           self.show_game = not self.show_game
 
     def on_key_release(self, key, modifiers):
         """Called whenever a user releases a key."""
@@ -92,36 +88,14 @@ class Game(arcade.Window):
     def reset_enemies(self):
         del self.enemy_list[:]
 
+
 def main():
-    if SHOW_GAME == True:
-        Game(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        arcade.run()
-    else:
-        enemy_list = []
-        pop = Population(500, enemy_list)
-        frame_counter = 0
 
-        while True:
-            if pop.done() != True:
-                frame_counter += 1
-                if (frame_counter % 30 == 0):
-                    location = [BOTTOM, MIDDLE, TOP]
-                    index = random.randrange(len(location))
-                    enemy = Enemy(SCREEN_WIDTH, location[index], -7.5, 0,
-                                  CAR_HEIGHT, arcade.color.ANDROID_GREEN)
-                    enemy_list.append(enemy)
+    screen_title = "Game"
+    resolution = (800, 600)
 
-                for i, enemy in enumerate(enemy_list):
-                    enemy.update()
-                    if enemy.dead:
-                        del enemy_list[i]
-
-                pop.update_alive()
-            else:
-                print(f"Gen {pop.gen}")
-                print(f"Best score: {pop.best_score}")
-                pop.natural_selection()
-                del enemy_list[:]
+    game = Game(resolution[0], resolution[1], screen_title)
+    arcade.run()
 
 
 if __name__ == "__main__":
