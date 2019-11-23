@@ -13,11 +13,12 @@ from population import Population
 class Game(arcade.Window):
 
     def __init__(self, width, height, title):
-        super().__init__(width, height, title)
+        super().__init__(width, height, title, fullscreen=True)
 
-        self.top = self.height/2 + 0.25 * self.height
+        self.gap_factor = 0.25
+        self.top = self.height/2 + self.gap_factor * self.height
         self.middle = self.height/2
-        self.bottom = self.height/2 - 0.25 * self.height
+        self.bottom = self.height/2 - self.gap_factor * self.height
         self.show_game = True
         self.enemy_list = []
         self.frame_counter = 0
@@ -91,8 +92,10 @@ class Game(arcade.Window):
 
 def main():
 
-    screen_title = "Game"
-    resolution = (800, 600)
+    screen_title = "NEAT!"
+    aspect_ratio = (16, 9)
+    scale_factor = 78
+    resolution = ([scale_factor * dimension for dimension in aspect_ratio])
 
     game = Game(resolution[0], resolution[1], screen_title)
     arcade.run()
