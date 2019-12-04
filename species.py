@@ -118,7 +118,7 @@ class Species:
 
         for player in self.players:
             running_sum += player.fitness
-            if running_sum > p:
+            if running_sum >= p:
                 return player
 
     def cull(self):
