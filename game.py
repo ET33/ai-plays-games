@@ -13,7 +13,7 @@ from population import Population
 class Game(arcade.Window):
 
     def __init__(self, width, height, title):
-        super().__init__(width, height, title, fullscreen=True)
+        super().__init__(width, height, title)
 
         self.gap_factor = 0.25
         self.top = self.height/2 + self.gap_factor * self.height
@@ -23,11 +23,8 @@ class Game(arcade.Window):
         self.enemy_list = []
         self.frame_counter = 0
         self.display_info = True
-        self.pop = Population(500, self)
-
-        self.set_mouse_visible(False)
+        self.pop = Population(250, self)
         arcade.set_background_color(arcade.color.BLACK_OLIVE)
-
 
     def on_draw(self):
         """Called whenever we need to draw the window."""
@@ -43,11 +40,16 @@ class Game(arcade.Window):
             players[i].draw()
 
         if not self.pop.done():
-            arcade.draw_text("Current player \n\n"
-                             + "Score: " + str(players[0].score) + "\n"
-                             + "Best fitness: " + str(int(players[0].fitness)),
-                             0.01 * self.width, 0.9 * self.height,
-                             arcade.color.WHITE, 12)
+            arcade.draw_text(f"Generation {self.pop.gen}\n\n"
+                             + f"Overall best score: {self.pop.best_score}",
+                             0.01 * self.width, 0.01 * self.height,
+                             arcade.color.WHITE, 14)
+            arcade.draw_text("Current top player\n\n"
+                             + f"Score: {players[0].score}\n"
+                             + f"Fitness: {players[0].fitness}",
+                             0.99 * self.width, 0.01 * self.height,
+                             arcade.color.WHITE, 14,
+                             align='right', anchor_x='right')
             
         for enemy in self.enemy_list:
             enemy.draw()

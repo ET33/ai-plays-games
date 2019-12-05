@@ -10,12 +10,11 @@ class Population:
         self.species = []
         self.game = game
         self.gen = 0
-
-        self.mass_extinction_event = False
-        self.new_stage = False
+        self.generations_since_best_score= 0
         self.population_life = 0
+        self.size = size
 
-        for i in range(size):
+        for i in range(self.size):
             self.pop.append(Player(self.game))
             self.pop[i].brain.generate_network()
             self.pop[i].brain.mutate(self.innovation_history)
@@ -24,16 +23,15 @@ class Population:
         self.population_life += 1
 
         for player in self.pop:
-            if player.dead == False:
+            if not player.dead:
                 player.look()
                 player.think()
                 player.update()
 
     def done(self):
         for player in self.pop:
-            if player.dead == False:
+            if not player.dead:
                 return False
-
         return True
 
     def set_best_player(self):
@@ -44,40 +42,45 @@ class Population:
             self.gen_players.append(temp_best.clone())
             self.best_score = temp_best.score
             self.best_player = temp_best.clone()
+            self.generations_since_best_score = 0
+        else:
+            self.generations_since_best_score += 1
 
     def natural_selection(self):
         self.speciate()
         self.calculate_fitness()
         self.sort_species()
-
-        if self.mass_extinction_event == True:
-            self.mass_extinction()
-            self.mass_extinction_event = False
-
         self.cull_species()
-        self.set_best_player()
         self.kill_stale_species()
         self.kill_bad_species()
-
+        self.set_best_player()
+        if self.generations_since_best_score > 20:
+            self.sudden_death()
         average_sum = self.get_average_fitness_sum()
         children = []
 
+        # Get this generation's offspring
         for species in self.species:
-            children.append(species.champ.clone())
-            number_of_children = int(species.average_fitness / average_sum
-                                     * len(self.pop)) - 1
-            for i in range(number_of_children):
-                children.append(species.get_baby(self.innovation_history))
+            if len(species.players) != 0:
+                # Get babies in quantity proportional to a species's fitness
+                children.append(species.champ.clone())
+                number_of_children = int((species.average_fitness
+                                          / average_sum)
+                                          * self.size)
+                for i in range(number_of_children):
+                    children.append(species.get_baby(self.innovation_history))
 
-        while len(children) < len(self.pop):
-            children.append(self.species[0].get_baby(self.innovation_history))
+        for species in self.species:
+            # If we couldn't get enough babies, grab the rest from best species
+            if len(species.players) != 0:
+                while len(children) < self.size:
+                    children.append(species.get_baby(self.innovation_history))
+                break
         
         self.pop = children.copy()
         self.gen += 1
-
         for player in self.pop:
             player.brain.generate_network()
-
         self.population_life = 0
 
     def speciate(self):
@@ -86,14 +89,12 @@ class Population:
 
         for player in self.pop:
             species_found = False
-
             for species in self.species:
                 if species.same_species(player.brain) == True:
                     species.add_to_species(player)
                     player.color = species.color
                     species_found = True
                     break
-
             if species_found == False:
                 self.species.append(Species(player))
                 player.color = self.species[-1].color
@@ -109,29 +110,35 @@ class Population:
         self.species.sort(key=lambda x: x.best_fitness, reverse=True)
 
     def kill_stale_species(self):
+        """Kill species that haven't improved in a while."""
         self.species[2:] = [species for species in self.species[2:]
                            if species.staleness < 15]
     
     def kill_bad_species(self):
+        """Kill species that wouldn't be able to reproduce."""
         average_sum = self.get_average_fitness_sum()
 
         self.species[1:] = [species for species in self.species[1:]
-                           if species.average_fitness/average_sum *
-                           len(self.pop) >= 1]
+                           if (species.average_fitness / average_sum) *
+                           self.size >= 1]
 
     def cull_species(self):
+        """Kill bottom half players of species."""
         for species in self.species:
             species.cull()
             species.fitness_sharing()
             species.set_average()
 
-    def mass_extinction(self):
-        del self.species[5:]
+    def sudden_death(self):
+        """Kill every species but the top two if things get stale."""
+        del self.species[2:]
+        self.generations_since_best_score = 0
 
     def get_average_fitness_sum(self):
         average_sum = 0
 
         for species in self.species:
-            average_sum += species.average_fitness
+            if len(species.players) != 0:
+                average_sum += species.average_fitness
 
         return average_sum

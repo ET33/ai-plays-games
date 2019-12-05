@@ -96,6 +96,7 @@ class Player:
         clone = Player(self.game)
         clone.brain = self.brain.clone()
         clone.fitness = self.fitness
+        clone.unadjusted_fitness = self.unadjusted_fitness
         clone.brain.generate_network()
         clone.gen = self.gen
         clone.best_score = self.best_score
@@ -104,10 +105,12 @@ class Player:
         return clone
 
     def calculate_fitness(self):
-        self.fitness = self.score*self.score
+        self.unadjusted_fitness = self.score*self.score
+        self.fitness = self.unadjusted_fitness
 
     def crossover(self, parent_2):
         child = Player(self.game)
+        child.color = self.color
         child.brain = self.brain.crossover(parent_2.brain)
         child.brain.generate_network()
         
@@ -121,6 +124,8 @@ class Player:
 
             for enemy in self.game.enemy_list:
                 dist = enemy.position_x - self.position_x
+                if dist <= 0:
+                    continue
                 if enemy.position_y == self.bottom:
                     if dist < dist_min_bot:
                         dist_min_bot = dist

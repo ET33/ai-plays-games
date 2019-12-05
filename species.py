@@ -7,7 +7,7 @@ class Species:
         self.average_fitness = 0
         self.staleness = 0
         self.excess_coeff = 1
-        self.weight_diff_coeff = 0.5
+        self.weight_diff_coeff = 0.4
         self.compatibility_threshold = 3
         self.color = (randrange(256),
                       randrange(256),
@@ -23,12 +23,12 @@ class Species:
         excess_and_disjoint = self.get_excess_disjoint(genome, self.rep)
         average_weight_diff = self.average_weight_diff(genome, self.rep)
 
-        large_genome_normaliser = len(genome.genes)-20
-        if large_genome_normaliser < 1:
-            large_genome_normaliser = 1
+        normaliser = max(len(genome.genes), len(self.rep.genes))
+        if normaliser <= 20:
+            normaliser = 1
 
         compatibility = (self.excess_coeff * excess_and_disjoint
-                         / large_genome_normaliser
+                         / normaliser
                          + self.weight_diff_coeff * average_weight_diff)
         return self.compatibility_threshold > compatibility
 
@@ -47,7 +47,7 @@ class Species:
         return len(genome_1.genes) + len(genome_2.genes) - 2*matching
 
     def average_weight_diff(self, genome_1, genome_2):
-        if len(genome_1.genes) == 0 or len(genome_2.genes):
+        if len(genome_1.genes) == 0 or len(genome_2.genes) == 0:
             return 0
 
         matching = 0
@@ -66,7 +66,7 @@ class Species:
 
     def sort_species(self):
         if len(self.players) == 0:
-            self.staleness = 200
+            self.staleness += 1
             return
         self.players.sort(key=lambda x: x.fitness, reverse=True)
 
@@ -82,29 +82,32 @@ class Species:
         if len(self.players) == 0:
             return
 
-        sum = 0
+        fitness_sum = 0
 
         for player in self.players:
-            sum += player.fitness
+            fitness_sum += player.fitness
 
-        self.average_fitness = sum/len(self.players)
+        self.average_fitness = fitness_sum/len(self.players)
 
     def get_baby(self, innovation_history):
         p = uniform(0,1)
 
         if p < 0.25:
+            # Get a baby with no crossover
             baby = self.select_player().clone()
         else:
+            # Perform the crossover between parents
             parent_1 = self.select_player()
             parent_2 = self.select_player()
 
+            # Inherit excessive/disjoint genes from fittest parent
             if parent_1.fitness < parent_2.fitness:
                 baby = parent_2.crossover(parent_1)
             else:
                 baby = parent_1.crossover(parent_2)
 
+        # Mutate baby
         baby.brain.mutate(innovation_history)
-
         return baby
 
     def select_player(self):
@@ -122,9 +125,10 @@ class Species:
                 return player
 
     def cull(self):
+        """Culls bottom half of the species."""
         if len(self.players) > 2:
-            del self.players[int(len(self.players)/2):]
+            del self.players[len(self.players)//2:]
 
     def fitness_sharing(self):
         for player in self.players:
-            player.fitness /= len(self.players)
+            player.fitness = player.unadjusted_fitness / len(self.players)

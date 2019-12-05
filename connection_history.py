@@ -1,18 +1,14 @@
 class ConnectionHistory:
-    def __init__(self, from_node, to_node, innovation_number,
-                 innovation_numbers):
+    global_innovation_number = 1
+
+    def __init__(self, from_node, to_node):
         self.from_node = from_node
         self.to_node = to_node
-        self.innovation_number = innovation_number
-        self.innovation_numbers = innovation_numbers.copy()
+        self.innovation_number = ConnectionHistory.global_innovation_number
+        ConnectionHistory.global_innovation_number += 1
 
-    def matches(self, genome, from_node, to_node):
-        if len(genome.genes) == len(self.innovation_numbers):
-            if (from_node.number == self.from_node
+    def matches(self, from_node, to_node):
+        if (from_node.number == self.from_node
                 and to_node.number == self.to_node):
-                for gene in genome.genes:
-                    if gene.innovation_number not in self.innovation_numbers:
-                        return False
-                return True
-
+            return True
         return False
